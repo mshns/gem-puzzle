@@ -101,6 +101,8 @@ select.addEventListener("change", () => {
   setArray(select.value);
   count = 0;
   movesContainer.innerHTML = "Moves: " + count;
+  clearInterval(timer);
+  timeContainer.innerHTML = "Time: " + "00:00";
 })
 
 // проверка решаемости
@@ -119,6 +121,11 @@ function checkSolution(size) {
       row = Math.ceil((i + 1) / size);
     }
   }
+
+  console.log(size)
+
+  console.log(sum, row)
+
   if (size % 2 === 0) {
     if ((sum + row) % 2 === 0) {
       setPuzzle(cellsArray, select.value);
@@ -133,8 +140,6 @@ function checkSolution(size) {
     }
   }
 }
-
-checkSolution();
 
 function shuffle(a, b) {
   return 0.5 - Math.random();
@@ -168,6 +173,7 @@ function setPuzzle(cells, size) {
 document.querySelectorAll(".template").forEach(element => {
   element.addEventListener("click", cell => {
     if (Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) + Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) - Math.trunc(100 / select.value) < 2) {
+      playAudio(0);
       let x = cell.target.style.left;
       let y = cell.target.style.top;
       cell.target.style.left = empty.left;
@@ -175,6 +181,17 @@ document.querySelectorAll(".template").forEach(element => {
       empty.left = x;
       empty.top = y;
       count++;
+      if (count === 1) {
+        second = 1;
+        timeContainer.innerHTML = "Good luck!";
+        timer = setInterval(function() {
+          seconds = ('0' + second % 60).slice(-2);
+          minutes = ('0' + Math.floor(second / 60)).slice(-2);
+          timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
+          second++;
+        }, 1000);
+
+      }
       movesContainer.innerHTML = "Moves: " + count;
     }
 
@@ -183,7 +200,12 @@ document.querySelectorAll(".template").forEach(element => {
       if (e.innerHTML == (parseInt(e.style.top) / parseInt(100 / select.value) * select.value + parseInt(e.style.left) / parseInt(100 / select.value) + 1)) {
         win++
       }
-      if (win === select.value ** 2 - 1) alert('WIN!')
+      if (win === select.value ** 2 - 1) {
+        playAudio(1);
+        speechSynthesis.speak(new SpeechSynthesisUtterance(`Congratulations! You completed the puzzle in ${count} moves`));
+        clearInterval(timer);
+        alert('WIN!')
+      }
     });
   })
 })
@@ -197,7 +219,11 @@ movesContainer.innerHTML = "Moves: " + count;
 // time
 
 const timeContainer = document.querySelector(".time");
-timeContainer.innerHTML = "Time: 00:00";
+let second = 0;
+let seconds = ('0' + second % 60).slice(-2);
+let minutes = ('0' + Math.floor(second / 60)).slice(-2);
+timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
+let  timer;
 
 // shuffle and start button
 
@@ -207,5 +233,26 @@ buttonStart.addEventListener("click", () => {
   setArray(select.value);
   count = 0;
   movesContainer.innerHTML = "Moves: " + count;
+  clearInterval(timer);
+  timeContainer.innerHTML = "Time: " + "00:00";
 })
+
+// sound
+
+const sounds = [
+  {
+    title: 'move',
+    src: './assets/move.mp3',
+  },
+  {
+    title: 'win',
+    src: './assets/win.mp3',
+  }
+]
+
+const audio = new Audio();
+function playAudio(sound) {
+  audio.src = sounds[sound].src;
+  audio.play();
+}
 
