@@ -209,7 +209,7 @@ document.querySelectorAll(".template").forEach(element => {
       if (win === select.value ** 2 - 1) {
         clearInterval(timer);
         playAudio(1);
-        speechSynthesis.speak(new SpeechSynthesisUtterance(`Congratulations! You completed the puzzle in ${count} moves`));
+        if (isPlay) speechSynthesis.speak(new SpeechSynthesisUtterance(`Поздравляю, Вы собрали пазл за ${count} ходов`));
         popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ходов!`;
         shadow.classList.add("active");
         popup.classList.add("active");
