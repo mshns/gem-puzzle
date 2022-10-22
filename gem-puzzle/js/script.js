@@ -163,6 +163,7 @@ function setPuzzle(cells, size) {
 
     if (cells[element] !== 0) {
       cell.classList.add("cell");
+      cell.setAttribute("draggable", true);
       cell.style.left = left;
       cell.style.top = top;
       cell.style.width = 100 / size + '%';
@@ -196,7 +197,6 @@ document.querySelectorAll(".template").forEach(element => {
           timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
           second++;
         }, 1000);
-
       }
       movesContainer.innerHTML = "Moves: " + count;
     }
@@ -216,6 +216,61 @@ document.querySelectorAll(".template").forEach(element => {
       }
     });
   })
+
+// drag and drop
+/*
+  element.addEventListener("dragstart", dragStart);
+  function dragStart(e) {
+    e.dataTransfer.setData('id', e.target.id);
+  }
+*/
+  element.addEventListener("dragend", cell => {
+    if (Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) + Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) - Math.trunc(100 / select.value) < 2) {
+      playAudio(0);
+      let x = cell.target.style.left;
+      let y = cell.target.style.top;
+      cell.target.style.left = empty.left;
+      cell.target.style.top = empty.top;
+      empty.left = x;
+      empty.top = y;
+      count++;
+      if (count === 1) {
+        second = 1;
+        timeContainer.innerHTML = "Good luck!";
+        timer = setInterval(function() {
+          seconds = ('0' + second % 60).slice(-2);
+          minutes = ('0' + Math.floor(second / 60)).slice(-2);
+          timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
+          second++;
+        }, 1000);
+      }
+      movesContainer.innerHTML = "Moves: " + count;
+    }
+
+    let win = 0
+    element.childNodes.forEach(e => {
+      if (e.innerHTML == (parseInt(e.style.top) / parseInt(100 / select.value) * select.value + parseInt(e.style.left) / parseInt(100 / select.value) + 1)) {
+        win++
+      }
+      if (win === select.value ** 2 - 1) {
+        clearInterval(timer);
+        playAudio(1);
+        if (isPlay) speechSynthesis.speak(new SpeechSynthesisUtterance(`Поздравляю, Вы собрали пазл за ${count} ходов`));
+        popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ходов!`;
+        shadow.classList.add("active");
+        popup.classList.add("active");
+      }
+    });
+  })
+
+
+
+//
+
+})
+
+template.addEventListener('dragover', el => {
+  el.preventDefault();
 })
 
 // moves
