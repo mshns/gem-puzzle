@@ -59,6 +59,8 @@ control.append(btnResults);
 
 const btnSound = document.createElement("button");
 btnSound.classList.add("button");
+btnSound.classList.add("button-sound");
+btnSound.id = "sound";
 btnSound.innerHTML = "Sound";
 control.append(btnSound);
 
@@ -78,6 +80,14 @@ const template = document.createElement("div");
 template.classList.add("template");
 container.append(template);
 
+const shadowDiv = document.createElement("div");
+shadowDiv.classList.add("shadow");
+document.body.append(shadowDiv);
+
+const popupDiv = document.createElement("div");
+popupDiv.classList.add("popup");
+document.body.append(popupDiv);
+
 // create an array with cell values
 
 let cellsArray = [];
@@ -95,7 +105,7 @@ function setArray(size) {
 
 setArray(select.value);
 
-// изменение размера пазла
+// puzzle size
 
 select.addEventListener("change", () => {
   setArray(select.value);
@@ -105,7 +115,7 @@ select.addEventListener("change", () => {
   timeContainer.innerHTML = "Time: " + "00:00";
 })
 
-// проверка решаемости
+// solvable check
 
 function checkSolution(size) {
   cellsArray.sort(shuffle);
@@ -121,10 +131,6 @@ function checkSolution(size) {
       row = Math.ceil((i + 1) / size);
     }
   }
-
-  console.log(size)
-
-  console.log(sum, row)
 
   if (size % 2 === 0) {
     if ((sum + row) % 2 === 0) {
@@ -201,10 +207,12 @@ document.querySelectorAll(".template").forEach(element => {
         win++
       }
       if (win === select.value ** 2 - 1) {
+        clearInterval(timer);
         playAudio(1);
         speechSynthesis.speak(new SpeechSynthesisUtterance(`Congratulations! You completed the puzzle in ${count} moves`));
-        clearInterval(timer);
-        alert('WIN!')
+        popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ходов!`;
+        shadow.classList.add("active");
+        popup.classList.add("active");
       }
     });
   })
@@ -239,6 +247,8 @@ buttonStart.addEventListener("click", () => {
 
 // sound
 
+let isPlay = true;
+
 const sounds = [
   {
     title: 'move',
@@ -252,7 +262,24 @@ const sounds = [
 
 const audio = new Audio();
 function playAudio(sound) {
-  audio.src = sounds[sound].src;
-  audio.play();
+  if (isPlay) {
+    audio.src = sounds[sound].src;
+    audio.play();
+  }
 }
 
+const buttonSound = document.getElementById("sound");
+buttonSound.addEventListener("click", () => {
+  isPlay ? isPlay = false : isPlay = true;
+  buttonSound.classList.toggle("button-sound")
+})
+
+// popup
+
+const popup = document.querySelector(".popup");
+const shadow = document.querySelector(".shadow");
+
+shadow.addEventListener("click", () => {
+  shadow.classList.remove("active");
+  popup.classList.remove("active");
+})

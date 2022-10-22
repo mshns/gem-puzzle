@@ -16,6 +16,7 @@ body {
   font-weight: 100;
   color: #FFF;
   background-color: #663399;
+  position: relative;
 }
 
 .container {
@@ -64,6 +65,25 @@ select {
   cursor: pointer;
   transition: ease-in-out .25s;
   outline: none;
+}
+
+.button-sound {
+  position: relative;
+}
+
+.button-sound::before,
+.button-sound::after {
+  position: absolute;
+  top: .9vw; left: 0;
+  content: "";
+  width: 5.5vw;
+  height: .1vw;
+  background-color: #663399;
+  transform: rotate(-15deg);
+}
+
+.button-sound::after {
+  transform: rotate(15deg);
 }
 
 .button:hover,
@@ -118,3 +138,48 @@ select:hover {
   background-color: #FFF;
 }
 
+.shadow {
+  width: 100vw; height: 100vh;
+  position: fixed;
+  background-color: #3366cc80;
+  z-index: -100;
+}
+
+.shadow.active {
+  z-index: 100;
+}
+
+.popup {
+  width: 320px; height: 200px;
+  text-align: center;
+  border-radius: 10px;
+  padding: 20px;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: -150vh;
+  margin: auto;
+  font-size: 32px;
+  color: #663399;
+  background-color: #FFF;
+  z-index: -90;
+}
+
+.popup::before {
+  content: '\1F603';
+  position: absolute;
+  font-size: 64px;
+  left: -20px; bottom: -25px;
+  transform: rotate(-15deg);
+}
+
+.popup::after {
+  content: '\1F929';
+  position: absolute;
+  font-size: 64px;
+  right: -20px; bottom: -25px;
+  transform: rotate(15deg);
+}
+
+.popup.active {
+  bottom: 0;
+  z-index: 110;
+}
