@@ -24,7 +24,6 @@ option3x3.innerHTML = "3x3";
 option3x3.setAttribute("value", 3);
 option4x4.innerHTML = "4x4";
 option4x4.setAttribute("value", 4);
-option4x4.selected = true;
 option5x5.innerHTML = "5x5";
 option5x5.setAttribute("value", 5);
 option6x6.innerHTML = "6x6";
@@ -33,6 +32,25 @@ option7x7.innerHTML = "7x7";
 option7x7.setAttribute("value", 7);
 option8x8.innerHTML = "8x8";
 option8x8.setAttribute("value", 8);
+
+if (localStorage.getItem("gameSize")) {
+  option3x3.selected = false;
+  option4x4.selected = false;
+  option5x5.selected = false;
+  option6x6.selected = false;
+  option7x7.selected = false;
+  option8x8.selected = false;
+
+  if (localStorage.gameSize === "3") option3x3.selected = true;
+  if (localStorage.gameSize === "4") option4x4.selected = true;
+  if (localStorage.gameSize === "5") option5x5.selected = true;
+  if (localStorage.gameSize === "6") option6x6.selected = true;
+  if (localStorage.gameSize === "7") option7x7.selected = true;
+  if (localStorage.gameSize === "8") option8x8.selected = true;
+} else {
+  option4x4.selected = true;
+}
+
 select.append(option3x3);
 select.append(option4x4);
 select.append(option5x5);
@@ -80,13 +98,17 @@ const template = document.createElement("div");
 template.classList.add("template");
 container.append(template);
 
-const shadowDiv = document.createElement("div");
-shadowDiv.classList.add("shadow");
-document.body.append(shadowDiv);
+const shadow = document.createElement("div");
+shadow.classList.add("shadow");
+document.body.append(shadow);
 
-const popupDiv = document.createElement("div");
-popupDiv.classList.add("popup");
-document.body.append(popupDiv);
+const popup = document.createElement("div");
+popup.classList.add("popup");
+document.body.append(popup);
+
+const results = document.createElement("div");
+results.classList.add("results");
+document.body.append(results);
 
 // create an array with cell values
 
@@ -103,7 +125,33 @@ function setArray(size) {
   checkSolution(select.value);
 }
 
-setArray(select.value);
+// time
+
+const timeContainer = document.querySelector(".time");
+let timer;
+let count = 0;
+let second = 0;
+
+let seconds = ('0' + second % 60).slice(-2);
+let minutes = ('0' + Math.floor(second / 60)).slice(-2);
+timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
+
+
+if (localStorage.getItem("gameState")) {
+  template.innerHTML = localStorage.gameState;
+  empty.left = JSON.parse(localStorage.empty).left;
+  empty.top = JSON.parse(localStorage.empty).top;
+  second = localStorage.timeCount;
+  count = localStorage.movesCount
+  timer = setInterval(function() {
+    seconds = ('0' + second % 60).slice(-2);
+    minutes = ('0' + Math.floor(second / 60)).slice(-2);
+    timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
+    second++;
+  }, 1000);
+} else {
+  setArray(select.value);
+}
 
 // puzzle size
 
@@ -188,6 +236,7 @@ document.querySelectorAll(".template").forEach(element => {
       empty.left = x;
       empty.top = y;
       count++;
+
       if (count === 1) {
         second = 1;
         timeContainer.innerHTML = "Good luck!";
@@ -195,6 +244,7 @@ document.querySelectorAll(".template").forEach(element => {
           seconds = ('0' + second % 60).slice(-2);
           minutes = ('0' + Math.floor(second / 60)).slice(-2);
           timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
+
           second++;
         }, 1000);
       }
@@ -213,6 +263,8 @@ document.querySelectorAll(".template").forEach(element => {
         popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ходов!`;
         shadow.classList.add("active");
         popup.classList.add("active");
+        resultsArray.push({"moves": count, "time": second, "size": select.value});
+        setLocalStorage('results', JSON.stringify(resultsArray));
       }
     });
   })
@@ -241,6 +293,7 @@ document.querySelectorAll(".template").forEach(element => {
           seconds = ('0' + second % 60).slice(-2);
           minutes = ('0' + Math.floor(second / 60)).slice(-2);
           timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
+
           second++;
         }, 1000);
       }
@@ -259,11 +312,11 @@ document.querySelectorAll(".template").forEach(element => {
         popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ходов!`;
         shadow.classList.add("active");
         popup.classList.add("active");
+        resultsArray.push({"moves": count, "time": second, "size": select.value});
+        setLocalStorage("results", JSON.stringify(resultsArray));
       }
     });
   })
-
-
 
 //
 
@@ -276,23 +329,14 @@ template.addEventListener('dragover', el => {
 // moves
 
 const movesContainer = document.querySelector(".moves");
-let count = 0;
+
 movesContainer.innerHTML = "Moves: " + count;
 
-// time
 
-const timeContainer = document.querySelector(".time");
-let second = 0;
-let seconds = ('0' + second % 60).slice(-2);
-let minutes = ('0' + Math.floor(second / 60)).slice(-2);
-timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
-let  timer;
 
 // shuffle and start button
 
-const buttonStart = document.getElementById("start");
-
-buttonStart.addEventListener("click", () => {
+btnStart.addEventListener("click", () => {
   setArray(select.value);
   count = 0;
   movesContainer.innerHTML = "Moves: " + count;
@@ -323,18 +367,69 @@ function playAudio(sound) {
   }
 }
 
-const buttonSound = document.getElementById("sound");
-buttonSound.addEventListener("click", () => {
+btnSound.addEventListener("click", () => {
   isPlay ? isPlay = false : isPlay = true;
-  buttonSound.classList.toggle("button-sound")
+  btnSound.classList.toggle("button-sound")
 })
 
-// popup
-
-const popup = document.querySelector(".popup");
-const shadow = document.querySelector(".shadow");
+// popup shadow
 
 shadow.addEventListener("click", () => {
   shadow.classList.remove("active");
   popup.classList.remove("active");
+  results.classList.remove("active");
+})
+
+// results
+
+btnResults.addEventListener("click", () => {
+  results.innerHTML = "";
+
+  const subtitle = document.createElement("h2");
+  subtitle.classList.add("subtitle");
+  subtitle.textContent = "Results";
+  results.append(subtitle);
+
+  const ol = document.createElement("ol");
+  for (let i = 0; i < 10; i++) {
+    const li = document.createElement("li");
+    li.classList.add("results-item");
+    if (resultsArray[i]) {
+      li.textContent = " Moves: " + resultsArray.sort(topResults)[i].moves + " ◾ Time: " + resultsArray[i].time + " ◾ Size: " + resultsArray[i].size;
+    }
+    ol.append(li);
+  }
+  results.append(ol);
+
+  shadow.classList.add("active");
+  results.classList.add("active");
+})
+
+// save
+
+let resultsArray = [];
+if (localStorage.getItem("results")) {
+  resultsArray = JSON.parse(localStorage.results);
+}
+
+function topResults(a, b) {
+  return a.moves > b.moves ? 1 : -1;
+}
+
+function setLocalStorage(key, value) {
+  localStorage.setItem(key, value);
+}
+
+function getLocalStorage(key) {
+  if (localStorage.getItem(key)) {
+    key.value = localStorage.getItem(key);
+  }
+}
+
+btnSave.addEventListener("click", () => {
+  setLocalStorage("timeCount", second);
+  setLocalStorage('movesCount', count);
+  setLocalStorage("gameSize", select.value);
+  setLocalStorage('gameState', template.innerHTML);
+  setLocalStorage('empty', JSON.stringify(empty));
 })
