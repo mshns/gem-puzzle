@@ -16,6 +16,7 @@ body {
   font-weight: 100;
   color: #FFF;
   background-color: #663399;
+  background-image: url(../assets/puzzle.png);
   position: relative;
 }
 
@@ -75,9 +76,9 @@ select {
 .button-sound::before,
 .button-sound::after {
   position: absolute;
-  top: .9vw; left: 0;
+  top: 15px; left: 0;
+  width: 90px;
   content: "";
-  width: 5.5vw;
   height: .1vw;
   background-color: #663399;
   transform: rotate(-15deg);
@@ -292,6 +293,11 @@ select:hover {
     flex-wrap: wrap;
   }
 
+  .button-sound::before,
+  .button-sound::after {
+    display: none;
+  }
+
   .template {
     width: 80vw; height: 80vw;
   }
@@ -306,14 +312,13 @@ select:hover {
   }
 
   .button,
-  select,
-  .moves,
-  .time {
-  font-size: 3vw;
+  select {
+  font-size: 4vw;
   }
 
   .moves,
   .time {
     width: 20vw;
+    font-size: 3vw;
   }
 }
