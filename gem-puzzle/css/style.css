@@ -111,7 +111,6 @@ select:hover {
   font-style: normal;
   font-weight: 100;
   color: #FFF;
-  cursor: pointer;
   transition: ease-in-out .25s;
   outline: none;
 }
@@ -138,7 +137,21 @@ select:hover {
   border: 5px solid #FFF;
   font-size: 32px;
   transition: ease-in-out .1s;
-  cursor: pointer;
+  cursor: move;
+}
+
+.cell-empty {
+  position: absolute;
+  pointer-events: none;
+}
+
+.cell-empty.active {
+  pointer-events: auto;
+}
+
+
+.hidden {
+  display: none;
 }
 
 .cell:hover,
@@ -304,6 +317,7 @@ select:hover {
 
   .widget {
     width: 70vw;
+    margin: 2vw;
   }
 
   .cell {

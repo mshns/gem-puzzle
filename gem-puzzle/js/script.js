@@ -218,11 +218,19 @@ function setPuzzle(cells, size) {
       cell.innerHTML = cells[element];
       template.append(cell);
     } else {
+      cell.classList.add("cell-empty");
+      cell.style.left = left;
+      cell.style.top = top;
+      cell.style.width = 100 / size + '%';
+      cell.style.height = 100 / size + '%';
+      template.append(cell);
       empty.left = left;
       empty.top = top;
     }
   }
 }
+
+
 
 document.querySelectorAll(".template").forEach(element => {
   element.addEventListener("click", cell => {
@@ -234,6 +242,8 @@ document.querySelectorAll(".template").forEach(element => {
       cell.target.style.top = empty.top;
       empty.left = x;
       empty.top = y;
+      document.querySelector(".cell-empty").style.left = x;
+      document.querySelector(".cell-empty").style.top = y;
       count++;
 
       if (count === 1) {
@@ -269,14 +279,25 @@ document.querySelectorAll(".template").forEach(element => {
   })
 
 // drag and drop
-/*
-  element.addEventListener("dragstart", dragStart);
-  function dragStart(e) {
-    e.dataTransfer.setData('id', e.target.id);
-  }
-*/
+
+  element.addEventListener("dragstart", cell => {
+    if (Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) + Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) - Math.trunc(100 / select.value) < 2) {
+      setTimeout(() => {
+        cell.target.classList.add("hidden");
+      }, 0);
+      document.querySelector(".cell-empty").classList.add("active")
+    }
+  })
+
+  element.addEventListener('dragover', cell => {
+    if (cell.target.classList.contains("cell-empty")) {
+      cell.preventDefault();
+    }
+  })
+
   element.addEventListener("dragend", cell => {
     if (Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) + Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) - Math.trunc(100 / select.value) < 2) {
+      cell.target.classList.remove("hidden");
       playAudio(0);
       let x = cell.target.style.left;
       let y = cell.target.style.top;
@@ -284,7 +305,10 @@ document.querySelectorAll(".template").forEach(element => {
       cell.target.style.top = empty.top;
       empty.left = x;
       empty.top = y;
+      document.querySelector(".cell-empty").style.left = x;
+      document.querySelector(".cell-empty").style.top = y;
       count++;
+
       if (count === 1) {
         second = 1;
         timeContainer.innerHTML = "Good luck!";
@@ -297,6 +321,7 @@ document.querySelectorAll(".template").forEach(element => {
         }, 1000);
       }
       movesContainer.innerHTML = "Moves: " + count;
+      document.querySelector(".cell-empty").classList.remove("active")
     }
 
     let win = 0
@@ -312,17 +337,10 @@ document.querySelectorAll(".template").forEach(element => {
         shadow.classList.add("active");
         popup.classList.add("active");
         resultsArray.push({"moves": count, "time": second, "size": select.value});
-        setLocalStorage("results", JSON.stringify(resultsArray));
+        setLocalStorage('results', JSON.stringify(resultsArray));
       }
     });
   })
-
-//
-
-})
-
-template.addEventListener('dragover', el => {
-  el.preventDefault();
 })
 
 // moves
@@ -330,8 +348,6 @@ template.addEventListener('dragover', el => {
 const movesContainer = document.querySelector(".moves");
 
 movesContainer.innerHTML = "Moves: " + count;
-
-
 
 // shuffle and start button
 
