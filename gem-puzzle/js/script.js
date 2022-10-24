@@ -136,7 +136,6 @@ let seconds = ('0' + second % 60).slice(-2);
 let minutes = ('0' + Math.floor(second / 60)).slice(-2);
 timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
 
-
 if (localStorage.getItem("gameState")) {
   template.innerHTML = localStorage.gameState;
   empty.left = JSON.parse(localStorage.empty).left;
@@ -427,6 +426,7 @@ function getLocalStorage(key) {
 }
 
 btnSave.addEventListener("click", () => {
+  clearInterval(timer);
   setLocalStorage("timeCount", second);
   setLocalStorage('movesCount', count);
   setLocalStorage("gameSize", select.value);

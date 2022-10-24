@@ -26,7 +26,7 @@ body {
 }
 
 .title {
-  font-size: 4vw;
+  font-size: 5vw;
   font-weight: 100;
   position: relative;
   margin-bottom: 1vw;
@@ -35,27 +35,28 @@ body {
 .title::before {
   content: '\1F92F';
   position: absolute;
-  left: -6vw; top: -1vw;
+  left: -8vw; top: -1vw;
   transform: rotate(-15deg);
 }
 
 .title::after {
   content: '\1F92F';
   position: absolute;
-  right: -6vw; top: 0;
+  right: -8vw; top: 0;
   transform: rotate(15deg);
 }
 
 .control {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-content: center;
 }
 
 .button,
 select {
-  margin: 0 .5vw 1vw;
+  margin: 1vw;
   font-family: 'Russo One';
-  font-size: 1.5vw;
+  font-size: 24px;
   font-style: normal;
   font-weight: 100;
   color: #FFF;
@@ -94,22 +95,28 @@ select:hover {
 }
 
 .widget {
-  width: 100%;
+  width: 30vw;
+  margin-bottom: 1vw;
   display: flex;
-  justify-content: space-between;
-  align-content: center;
+  justify-content: space-around;
+  border-radius: 4px;
 }
 
 .moves,
 .time {
-  padding: 5px;
-  background-color: #3366cc;
-  border-radius: 10px;
-  width: 33%;
+  width: 150px;
+  font-family: 'Russo One';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 100;
+  color: #FFF;
+  cursor: pointer;
+  transition: ease-in-out .25s;
+  outline: none;
 }
 
 .template {
-  width: 35vw; height: 35vw;
+  width: 30vw; height: 30vw;
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -128,7 +135,7 @@ select:hover {
   background-color: #3366cc;
   border-radius: 20px;
   border: 5px solid #FFF;
-  font-size: 2.5vw;
+  font-size: 32px;
   transition: ease-in-out .1s;
   cursor: pointer;
 }
@@ -192,9 +199,10 @@ select:hover {
   border-radius: 10px;
   padding: 10px;
   position: fixed;
-  top: -150vh; left: 0; right: 0; bottom: 0;
+  top: -200vh; left: 0; right: 0; bottom: 0;
   margin: auto;
-  font-size: 16px;
+  font-size: 15px;
+  line-height: 22px;
   color: #663399;
   background-color: #FFF;
   z-index: -90;
@@ -223,20 +231,89 @@ select:hover {
 .results-item {
   text-decoration: underline;
 }
-@media (max-width: 639px) {
+
+@media (max-width: 1600px) {
+  .title {
+    font-size: 4.5vw;
+  }
+
   .template {
-    width: 80vw; height: 80vw;
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-content: space-between;
-    background-color: #FFF;
-    border-radius: 10px;
-    box-shadow: 0 0 .5vw .25vw #3366cc;
+    width: 40vw; height: 40vw;
+  }
+
+  .widget {
+    width: 40vw;
   }
 
   .cell {
-  font-size: 5vw;
+  font-size: 3vw;
+  }
+}
+
+@media (max-width: 1440px) {
+  .template {
+    width: 50vw; height: 50vw;
+  }
+
+  .widget {
+    width: 50vw;
+  }
+}
+
+@media (max-width: 1000px) {
+  .title {
+    font-size: 6vw;
+  }
+
+  .template {
+    width: 60vw; height: 60vw;
+  }
+
+  .widget {
+    width: 50vw;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 8vw;
+  }
+
+  .title::before {
+    left: -12vw;
+  }
+
+  .title::after {
+    right: -12vw;
+  }
+
+  .control {
+    width: 70%;
+    flex-wrap: wrap;
+  }
+
+  .template {
+    width: 80vw; height: 80vw;
+  }
+
+  .widget {
+    width: 70vw;
+  }
+
+  .cell {
+    font-size: 4vw;
+    border-radius: 10px;
+  }
+
+  .button,
+  select,
+  .moves,
+  .time {
+  font-size: 3vw;
+  }
+
+  .moves,
+  .time {
+    width: 20vw;
   }
 }
