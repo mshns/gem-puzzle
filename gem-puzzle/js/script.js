@@ -132,8 +132,8 @@ let timer;
 let count = 0;
 let second = 0;
 
-let seconds = ('0' + second % 60).slice(-2);
-let minutes = ('0' + Math.floor(second / 60)).slice(-2);
+let seconds = ("0" + (second % 60)).slice(-2);
+let minutes = ("0" + Math.floor(second / 60)).slice(-2);
 timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
 
 if (localStorage.getItem("gameState")) {
@@ -141,13 +141,15 @@ if (localStorage.getItem("gameState")) {
   empty.left = JSON.parse(localStorage.empty).left;
   empty.top = JSON.parse(localStorage.empty).top;
   second = localStorage.timeCount;
-  count = localStorage.movesCount
-  timer = setInterval(function() {
-    seconds = ('0' + second % 60).slice(-2);
-    minutes = ('0' + Math.floor(second / 60)).slice(-2);
-    timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
-    second++;
-  }, 1000);
+  count = localStorage.movesCount;
+  if (second != 0) {
+    timer = setInterval(function () {
+      seconds = ("0" + (second % 60)).slice(-2);
+      minutes = ("0" + Math.floor(second / 60)).slice(-2);
+      timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
+      second++;
+    }, 1000);
+  }
 } else {
   setArray(select.value);
 }
@@ -160,7 +162,7 @@ select.addEventListener("change", () => {
   movesContainer.innerHTML = "Moves: " + count;
   clearInterval(timer);
   timeContainer.innerHTML = "Time: " + "00:00";
-})
+});
 
 // solvable check
 
@@ -171,7 +173,7 @@ function checkSolution(size) {
   for (let i = 0; i < cellsArray.length; i++) {
     for (let j = i + 1; j < cellsArray.length; j++) {
       if (cellsArray[i] > cellsArray[j] && cellsArray[j] !== 0) {
-        sum ++;
+        sum++;
       }
     }
     if (cellsArray[i] === 0) {
@@ -205,24 +207,24 @@ function setPuzzle(cells, size) {
 
   for (let element in cells) {
     const cell = document.createElement("div");
-    let left = (element % size) * 100 / size + '%';
-    let top = Math.trunc(element / size) * 100 / size + '%';
+    let left = ((element % size) * 100) / size + "%";
+    let top = (Math.trunc(element / size) * 100) / size + "%";
 
     if (cells[element] !== 0) {
       cell.classList.add("cell");
       cell.setAttribute("draggable", true);
       cell.style.left = left;
       cell.style.top = top;
-      cell.style.width = 100 / size + '%';
-      cell.style.height = 100 / size + '%';
+      cell.style.width = 100 / size + "%";
+      cell.style.height = 100 / size + "%";
       cell.innerHTML = cells[element];
       template.append(cell);
     } else {
       cell.classList.add("cell-empty");
       cell.style.left = left;
       cell.style.top = top;
-      cell.style.width = 100 / size + '%';
-      cell.style.height = 100 / size + '%';
+      cell.style.width = 100 / size + "%";
+      cell.style.height = 100 / size + "%";
       template.append(cell);
       empty.left = left;
       empty.top = top;
@@ -230,11 +232,14 @@ function setPuzzle(cells, size) {
   }
 }
 
-
-
-document.querySelectorAll(".template").forEach(element => {
-  element.addEventListener("click", cell => {
-    if (Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) + Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) - Math.trunc(100 / select.value) < 2) {
+document.querySelectorAll(".template").forEach((element) => {
+  element.addEventListener("click", (cell) => {
+    if (
+      Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) +
+        Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) -
+        Math.trunc(100 / select.value) <
+      2
+    ) {
       playAudio(0);
       let x = cell.target.style.left;
       let y = cell.target.style.top;
@@ -249,54 +254,86 @@ document.querySelectorAll(".template").forEach(element => {
       if (count === 1) {
         second = 1;
         timeContainer.innerHTML = "Good luck!";
-        timer = setInterval(function() {
-          seconds = ('0' + second % 60).slice(-2);
-          minutes = ('0' + Math.floor(second / 60)).slice(-2);
+        timer = setInterval(function () {
+          seconds = ("0" + (second % 60)).slice(-2);
+          minutes = ("0" + Math.floor(second / 60)).slice(-2);
           timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
-
           second++;
         }, 1000);
       }
       movesContainer.innerHTML = "Moves: " + count;
     }
 
-    let win = 0
-    element.childNodes.forEach(e => {
-      if (e.innerHTML == (parseInt(e.style.top) / parseInt(100 / select.value) * select.value + parseInt(e.style.left) / parseInt(100 / select.value) + 1)) {
-        win++
+    let win = 0;
+    element.childNodes.forEach((e) => {
+      if (
+        e.innerHTML ==
+        (parseInt(e.style.top) / parseInt(100 / select.value)) * select.value +
+          parseInt(e.style.left) / parseInt(100 / select.value) +
+          1
+      ) {
+        win++;
       }
       if (win === select.value ** 2 - 1) {
         clearInterval(timer);
         playAudio(1);
-        if (isPlay) speechSynthesis.speak(new SpeechSynthesisUtterance(`Поздравляю, Вы собрали пазл за ${count} ходов`));
-        popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ходов!`;
+
+        let steps = "ходов";
+        if (count % 10 === 1) {
+          steps = "ход";
+        } else if (count % 10 === 2 || count % 10 === 3 || count % 10 === 4) {
+          steps = "хода";
+        }
+
+        if (isPlay)
+          speechSynthesis.speak(
+            new SpeechSynthesisUtterance(
+              `Поздравляю, Вы собрали пазл за ${count} ${steps}`
+            )
+          );
+        popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ${steps}!`;
+
         shadow.classList.add("active");
         popup.classList.add("active");
-        resultsArray.push({"moves": count, "time": second, "size": select.value});
-        setLocalStorage('results', JSON.stringify(resultsArray));
+        resultsArray.push({
+          moves: count,
+          time: second - 1,
+          size: select.value,
+        });
+        setLocalStorage("results", JSON.stringify(resultsArray));
       }
     });
-  })
+  });
 
-// drag and drop
+  // drag and drop
 
-  element.addEventListener("dragstart", cell => {
-    if (Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) + Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) - Math.trunc(100 / select.value) < 2) {
+  element.addEventListener("dragstart", (cell) => {
+    if (
+      Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) +
+        Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) -
+        Math.trunc(100 / select.value) <
+      2
+    ) {
       setTimeout(() => {
         cell.target.classList.add("hidden");
       }, 0);
-      document.querySelector(".cell-empty").classList.add("active")
+      document.querySelector(".cell-empty").classList.add("active");
     }
-  })
+  });
 
-  element.addEventListener('dragover', cell => {
+  element.addEventListener("dragover", (cell) => {
     if (cell.target.classList.contains("cell-empty")) {
       cell.preventDefault();
     }
-  })
+  });
 
-  element.addEventListener("dragend", cell => {
-    if (Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) + Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) - Math.trunc(100 / select.value) < 2) {
+  element.addEventListener("dragend", (cell) => {
+    if (
+      Math.abs(parseInt(empty.left) - parseInt(cell.target.style.left)) +
+        Math.abs(parseInt(empty.top) - parseInt(cell.target.style.top)) -
+        Math.trunc(100 / select.value) <
+      2
+    ) {
       cell.target.classList.remove("hidden");
       playAudio(0);
       let x = cell.target.style.left;
@@ -312,41 +349,60 @@ document.querySelectorAll(".template").forEach(element => {
       if (count === 1) {
         second = 1;
         timeContainer.innerHTML = "Good luck!";
-        timer = setInterval(function() {
-          seconds = ('0' + second % 60).slice(-2);
-          minutes = ('0' + Math.floor(second / 60)).slice(-2);
+        timer = setInterval(function () {
+          seconds = ("0" + (second % 60)).slice(-2);
+          minutes = ("0" + Math.floor(second / 60)).slice(-2);
           timeContainer.innerHTML = "Time: " + minutes + ":" + seconds;
-
           second++;
         }, 1000);
       }
       movesContainer.innerHTML = "Moves: " + count;
-      document.querySelector(".cell-empty").classList.remove("active")
+      document.querySelector(".cell-empty").classList.remove("active");
     }
 
-    let win = 0
-    element.childNodes.forEach(e => {
-      if (e.innerHTML == (parseInt(e.style.top) / parseInt(100 / select.value) * select.value + parseInt(e.style.left) / parseInt(100 / select.value) + 1)) {
-        win++
+    let win = 0;
+    element.childNodes.forEach((e) => {
+      if (
+        e.innerHTML ==
+        (parseInt(e.style.top) / parseInt(100 / select.value)) * select.value +
+          parseInt(e.style.left) / parseInt(100 / select.value) +
+          1
+      ) {
+        win++;
       }
       if (win === select.value ** 2 - 1) {
         clearInterval(timer);
         playAudio(1);
-        if (isPlay) speechSynthesis.speak(new SpeechSynthesisUtterance(`Поздравляю, Вы собрали пазл за ${count} ходов`));
-        popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ходов!`;
+
+        let steps = "ходов";
+        if (count % 10 === 1) {
+          steps = "ход";
+        } else if (count % 10 === 2 || count % 10 === 3 || count % 10 === 4) {
+          steps = "хода";
+        }
+        if (isPlay)
+          speechSynthesis.speak(
+            new SpeechSynthesisUtterance(
+              `Поздравляю, Вы собрали пазл за ${count} ${steps}`
+            )
+          );
+        popup.innerHTML = `Ура! Вы решили головоломку<br>за ${minutes}:${seconds} и ${count} ${steps}!`;
         shadow.classList.add("active");
         popup.classList.add("active");
-        resultsArray.push({"moves": count, "time": second, "size": select.value});
-        setLocalStorage('results', JSON.stringify(resultsArray));
+        resultsArray.push({
+          moves: count,
+          time: second - 1,
+          size: select.value,
+        });
+        setLocalStorage("results", JSON.stringify(resultsArray));
       }
     });
-  })
-})
+  });
+});
 
 // moves
 
 const movesContainer = document.querySelector(".moves");
-
 movesContainer.innerHTML = "Moves: " + count;
 
 // shuffle and start button
@@ -357,7 +413,7 @@ btnStart.addEventListener("click", () => {
   movesContainer.innerHTML = "Moves: " + count;
   clearInterval(timer);
   timeContainer.innerHTML = "Time: " + "00:00";
-})
+});
 
 // sound
 
@@ -365,14 +421,14 @@ let isPlay = true;
 
 const sounds = [
   {
-    title: 'move',
-    src: './assets/move.mp3',
+    title: "move",
+    src: "./assets/move.mp3",
   },
   {
-    title: 'win',
-    src: './assets/win.mp3',
-  }
-]
+    title: "win",
+    src: "./assets/win.mp3",
+  },
+];
 
 const audio = new Audio();
 function playAudio(sound) {
@@ -383,9 +439,9 @@ function playAudio(sound) {
 }
 
 btnSound.addEventListener("click", () => {
-  isPlay ? isPlay = false : isPlay = true;
-  btnSound.classList.toggle("button-sound")
-})
+  isPlay ? (isPlay = false) : (isPlay = true);
+  btnSound.classList.toggle("button-sound");
+});
 
 // popup shadow
 
@@ -393,7 +449,7 @@ shadow.addEventListener("click", () => {
   shadow.classList.remove("active");
   popup.classList.remove("active");
   results.classList.remove("active");
-})
+});
 
 // results
 
@@ -410,7 +466,13 @@ btnResults.addEventListener("click", () => {
     const li = document.createElement("li");
     li.classList.add("results-item");
     if (resultsArray[i]) {
-      li.textContent = " Moves: " + resultsArray.sort(topResults)[i].moves + " ◾ Time: " + resultsArray[i].time + " ◾ Size: " + resultsArray[i].size;
+      li.textContent =
+        " Moves: " +
+        resultsArray.sort(topResults)[i].moves +
+        " ◾ Time: " +
+        resultsArray[i].time +
+        " ◾ Size: " +
+        resultsArray[i].size;
     }
     ol.append(li);
   }
@@ -418,7 +480,7 @@ btnResults.addEventListener("click", () => {
 
   shadow.classList.add("active");
   results.classList.add("active");
-})
+});
 
 // save
 
@@ -443,9 +505,37 @@ function getLocalStorage(key) {
 
 btnSave.addEventListener("click", () => {
   clearInterval(timer);
+  setLocalStorage("movesCount", count);
+  if (count === 0) second = 0;
   setLocalStorage("timeCount", second);
-  setLocalStorage('movesCount', count);
   setLocalStorage("gameSize", select.value);
-  setLocalStorage('gameState', template.innerHTML);
-  setLocalStorage('empty', JSON.stringify(empty));
-})
+  setLocalStorage("gameState", template.innerHTML);
+  setLocalStorage("empty", JSON.stringify(empty));
+});
+
+// score
+
+console.log(
+  "Contacts:\n",
+  "📧 Discord: mishanos#6940\nhttps://discordapp.com/users/561035807046238209\n",
+  "📧 Telegram: @msh_ns\nhttps://t.me/msh_ns\n\n",
+
+  "📂 Score: 120 / 120\n\n",
+
+  "✅ [+30] Basic scope\n",
+  "✔️ Layout, design, responsive UI [+10]\n",
+  "✔️ At the beginning state of the game, the frame is filled with randomly generated and shuffled numbers [+10]\n",
+  "✔️ On click on a tile next to an empty cell, the tile moves to the empty cell [+10]\n\n",
+
+  "✅ [+50] Advanced scope\n",
+  "✔️ The game can be restarted without reloading the page [+10]\n",
+  "✔️ Game duration and number of moves are displayed [+10]\n",
+  "✔️ Sound accompaniment (on/off) of tiles movement [+10]\n",
+  "✔️ Implemented saving the state of the game and saving the top 10 results using LocalStorage [+10]\n",
+  "✔️ Implemented selection of different sizes for frame [+10]\n\n",
+
+  "✅ [+40] Hacker scope\n",
+  "✔️ When the game is finished, the following message is displayed `Hooray! You solved the puzzle in ##:## and N moves!`. Shuffled algorithm work correctly - user can solve puzzle [+10]\n",
+  "✔️ Animation of tiles' movement on frame [+15]\n",
+  "✔️ Tiles can be dragged with use of mouse [+15]"
+);
